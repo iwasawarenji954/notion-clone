@@ -1,10 +1,16 @@
 'use client'
 
-import { ChevronsLeft, MenuIcon } from "lucide-react"
+import { ChevronsLeft, MenuIcon, PlusCircle, Search, Settings } from "lucide-react"
 import { usePathname } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { cn } from "@/lib/utils"
+import { UserItem } from "./user-item";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
+import { Item } from "./item";
+import { DocumentList } from "./document-list";
 
 export const Navigation = () => {
     const pathname = usePathname();
@@ -14,6 +20,7 @@ export const Navigation = () => {
     const navbarRef = useRef<ElementRef<"div">>(null);
     const [isResetting, setIsResetting] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(isMobile);
+    const create = useMutation(api.documents.create);
 
     useEffect(() => {
         if (isMobile) {
@@ -71,7 +78,7 @@ export const Navigation = () => {
                 isMobile ? "0" : "calc(100% -240px"
             );
             navbarRef.current.style.setProperty(
-                "lest",
+                "left",
                 isMobile ? "100%" : "240px"
             );
             setTimeout(() => setIsResetting(false), 300);
@@ -89,6 +96,16 @@ export const Navigation = () => {
             setTimeout(() => setIsResetting(false), 300);
         }
     }
+
+    const handleCreate = () => {
+        const promise = create({ title: "Untitled" });
+
+        toast.promise(promise, {
+            loading: "Creating a new page...",
+            success: "New note created!",
+            error: "Failed to create a new note."
+        });
+    };
 
     return (
         <>
@@ -108,13 +125,29 @@ export const Navigation = () => {
                         isMobile && "opacity-100"
                     )}
                 >
-                    <ChevronsLeft className="h-6 w-6" />
+                <ChevronsLeft className="h-6 w-6" />
                 </div>
                 <div>
-                    <p>Action items</p>
+                    <UserItem />
+                    <Item
+                        label="Search"
+                        icon={Search}
+                        isSearch
+                        // onClick={() => ()}
+                    />
+                    <Item
+                        label="Setting"
+                        icon={Settings}
+                        // onClick={() => ()}
+                    />
+                    <Item
+                        onClick={handleCreate}
+                        label="Newpage"
+                        icon={PlusCircle}
+                    />
                 </div>
                 <div className="mt-4">
-                    <p>documents</p>
+                    <DocumentList />
                 </div>
                 <div 
                     onMouseDown={handleMouseDown}
