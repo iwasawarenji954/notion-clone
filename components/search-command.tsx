@@ -44,7 +44,7 @@ export const SearchCommand = () => {
     }, [toggle]);
 
     const onSelect = (id: string) => {
-        router.push(`/docments/${id}`);
+        router.push(`/documents/${id}`);
         onClose();
     };
 
